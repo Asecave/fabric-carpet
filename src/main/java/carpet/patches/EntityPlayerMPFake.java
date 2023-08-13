@@ -39,7 +39,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     public Runnable fixStartingPosition = () -> {};
     public boolean isAShadow;
 
-    public static EntityPlayerMPFake createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
+    public static EntityPlayerMPFake createFake(String username, MinecraftServer server, Vec3 pos, boolean atLogout, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
     {
         //prolly half of that crap is not necessary, but it works
         ServerLevel worldIn = server.getLevel(dimensionId);
@@ -67,9 +67,13 @@ public class EntityPlayerMPFake extends ServerPlayer
             gameprofile = result.get();
         }
         EntityPlayerMPFake instance = new EntityPlayerMPFake(server, worldIn, gameprofile, false);
-        instance.fixStartingPosition = () -> instance.moveTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+        if (!atLogout) {
+        	instance.fixStartingPosition = () -> instance.moveTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+        }
         server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance);
-        instance.teleportTo(worldIn, pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+        if (!atLogout) {
+        	instance.teleportTo(worldIn, pos.x, pos.y, pos.z, (float)yaw, (float)pitch);
+        }
         instance.setHealth(20.0F);
         instance.unsetRemoved();
         instance.setMaxUpStep(0.6F);

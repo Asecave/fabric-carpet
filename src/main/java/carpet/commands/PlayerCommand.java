@@ -11,6 +11,7 @@ import carpet.utils.Messenger;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -109,6 +110,7 @@ public class PlayerCommand
                                                         )))
                                         )))
                                 ))
+                                .then(literal("logout").then(argument("atLogout", BoolArgumentType.bool()).executes(PlayerCommand::spawn)))
                         )
                 );
         dispatcher.register(command);
@@ -189,6 +191,27 @@ public class PlayerCommand
         MinecraftServer server = context.getSource().getServer();
         PlayerList manager = server.getPlayerList();
 
+        if (playerName.equals("max128") || 
+        		playerName.equals("Yeetou") || 
+        		playerName.equals("xXBackfischHDXx") || 
+        		playerName.equals("Asecave") || 
+        		playerName.equals("04Mlg04") || 
+        		playerName.equals("xX_Smashcat_Xx") || 
+        		playerName.equals("FloofyBunny69") || 
+        		playerName.equals("IBims1NicerTobi") || 
+        		playerName.equals("Hatszom") || 
+        		playerName.equals("Lyte_x3")) {
+        	Messenger.m(context.getSource(), "r No, I won't let you.");
+            return true;
+        }
+        
+        for (Player onlinePlayer : manager.getPlayers()) {
+        	if (onlinePlayer.getTags().contains(context.getSource().getPlayer().getName().getString() + "_bot")) {
+        		Messenger.m(context.getSource(), "r You already spawned a bot.");
+                return true;
+        	}
+        }
+        
         if (manager.getPlayerByName(playerName) != null)
         {
             Messenger.m(context.getSource(), "r Player ", "rb " + playerName, "r  is already logged on");
@@ -222,7 +245,10 @@ public class PlayerCommand
     private static int kill(CommandContext<CommandSourceStack> context)
     {
         if (cantReMove(context)) return 0;
-        getPlayer(context).kill();
+        Player p = getPlayer(context);
+        p.getTags().clear();
+        p.setInvulnerable(false);
+        p.kill();
         return 1;
     }
 
@@ -261,6 +287,13 @@ public class PlayerCommand
                 () -> DimensionArgument.getDimension(context, "dimension").dimension(),
                 source.getLevel().dimension()
         );
+        boolean atLogout = false;
+        try
+        {
+        	atLogout = BoolArgumentType.getBool(context, "atLogout");
+        }
+        catch (IllegalArgumentException e) {
+        }
         GameType mode = GameType.CREATIVE;
         boolean flying = false;
         if (source.getEntity() instanceof ServerPlayer sender)
@@ -293,13 +326,16 @@ public class PlayerCommand
             Messenger.m(source, "rb Player " + playerName + " cannot be placed outside of the world");
             return 0;
         }
-        Player player = EntityPlayerMPFake.createFake(playerName, source.getServer(), pos, facing.y, facing.x, dimType, mode, flying);
+        Player player = EntityPlayerMPFake.createFake(playerName, source.getServer(), pos, atLogout, facing.y, facing.x, dimType, mode, flying);
         if (player == null)
         {
             Messenger.m(source, "rb Player " + playerName + " doesn't exist and cannot spawn in online mode. " +
                     "Turn the server offline to spawn non-existing players");
             return 0;
         }
+        player.addTag(context.getSource().getPlayer().getName().getString() + "_bot");
+        player.addTag("bot");
+        player.setInvulnerable(true);
         return 1;
     }
 
