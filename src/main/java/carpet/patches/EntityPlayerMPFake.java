@@ -46,7 +46,7 @@ public class EntityPlayerMPFake extends ServerPlayer
     public boolean isAShadow;
 
     // Returns true if it was successful, false if couldn't spawn due to the player not existing in Mojang servers
-    public static boolean createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
+    public static boolean createFake(String username, MinecraftServer server, Vec3 pos, boolean atLogout, String ownerName, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode, boolean flying)
     {
         //prolly half of that crap is not necessary, but it works
         ServerLevel worldIn = server.getLevel(dimensionId);
@@ -75,9 +75,13 @@ public class EntityPlayerMPFake extends ServerPlayer
                 current = p.get();
             }
             EntityPlayerMPFake instance = new EntityPlayerMPFake(server, worldIn, current, ClientInformation.createDefault(), false);
-            instance.fixStartingPosition = () -> instance.moveTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+            if (!atLogout) {
+            	instance.fixStartingPosition = () -> instance.moveTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+            }
             server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance, new CommonListenerCookie(current, 0, instance.clientInformation(), false));
-            instance.teleportTo(worldIn, pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+            if (!atLogout) {
+            	instance.teleportTo(worldIn, pos.x, pos.y, pos.z, (float)yaw, (float)pitch);
+            }
             instance.setHealth(20.0F);
             instance.unsetRemoved();
             instance.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
@@ -87,6 +91,10 @@ public class EntityPlayerMPFake extends ServerPlayer
             //instance.world.getChunkManager(). updatePosition(instance);
             instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f); // show all model layers (incl. capes)
             instance.getAbilities().flying = flying;
+            
+            instance.addTag(ownerName + "_bot");
+            instance.addTag("bot");
+            instance.setInvulnerable(true);
         }, server);
         return true;
     }
