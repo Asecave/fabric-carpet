@@ -192,16 +192,18 @@ public class PlayerCommand
         MinecraftServer server = context.getSource().getServer();
         PlayerList manager = server.getPlayerList();
 
-        if (playerName.equals("max128") || 
-        		playerName.equals("Yeetou") || 
-        		playerName.equals("xXBackfischHDXx") || 
-        		playerName.equals("Asecave") || 
-        		playerName.equals("04Mlg04") || 
-        		playerName.equals("xX_Smashcat_Xx") || 
-        		playerName.equals("FloofyBunny69") || 
-        		playerName.equals("IBims1NicerTobi") || 
-        		playerName.equals("Hatszom") || 
-        		playerName.equals("Lyte_x3")) {
+        if (playerName.toLowerCase().equals("max128") || 
+        		playerName.toLowerCase().equals("yeetou") || 
+        		playerName.toLowerCase().equals("xxbackfischhdxx") || 
+        		playerName.toLowerCase().equals("asecave") || 
+        		playerName.toLowerCase().equals("04mlg04") || 
+        		playerName.toLowerCase().equals("xx_smashcat_xx") || 
+        		playerName.toLowerCase().equals("floofybunny69") || 
+        		playerName.toLowerCase().equals("ibims1nicertobi") || 
+        		playerName.toLowerCase().equals("hatszom") || 
+        		playerName.toLowerCase().equals("lyte_x3") || 
+        		playerName.toLowerCase().equals("liz3ax") || 
+        		playerName.toLowerCase().equals("proplayer616")) {
         	Messenger.m(context.getSource(), "r No, I won't let you. (That's a real player)");
             return true;
         }
