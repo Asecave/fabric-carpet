@@ -319,7 +319,7 @@ public class PlayerCommand
             playerName = context.getArgument("player", String.class);
             
         } catch (IllegalArgumentException e) {
-        	playerName = context.getSource().getDisplayName().getString() + "Two";
+        	playerName = context.getSource().getPlayer().getName().getString() + "Two";
         }
     	return playerName;
     }
